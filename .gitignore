@@ -1,0 +1,18 @@
+# Created by .ignore support plugin (hsz.mobi)
+### OpenCart template
+.htaccess
+/config.php
+admin/config.php
+
+!index.html
+
+download/
+image/cache/
+system/cache/
+system/logs/
+vqmod/logs
+vqmod/vqcache
+~
+.idea
+catalog/view/theme/default/style/sass/gulp/.sass-cache/
+catalog/view/theme/default/style/sass/gulp/node_modules/
