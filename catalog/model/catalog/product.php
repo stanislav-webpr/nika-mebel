@@ -533,16 +533,4 @@ class ModelCatalogProduct extends Model {
         }
         return $result;
     }
-
-    public function getAPropositionProducts($product_id) {
-        $result = array();
-        $query = $this->db->query("SELECT pp.*, p.price FROM " . DB_PREFIX . "proposition_product pp LEFT JOIN " . DB_PREFIX . "product p ON (p.product_id = pp.product_id)");
-        foreach($query->rows as $product) {
-            $result[$product['product_id']] = array(
-                'price' => $product['price'],
-                'price_included' => $product['price_included'],
-            );
-        }
-        return $result;
-    }
 }
