@@ -191,6 +191,13 @@ class Cart {
 						$price = $product_special_query->row['price'];
 					}
 
+                    //propositions
+                    $product_proposition_query = $this->db->query("SELECT * FROM proposition_product WHERE product_id = '" . (int)$product_id . "'");
+                    if($product_proposition_query->num_rows) {
+                        $price = $product_query->row['price'];
+                    }
+                    //************
+
 					// Reward Points
 					$product_reward_query = $this->db->query("SELECT points FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "'");
 
@@ -263,7 +270,7 @@ class Cart {
 						'width'           => $product_query->row['width'],
 						'height'          => $product_query->row['height'],
 						'length_class_id' => $product_query->row['length_class_id'],
-						'recurring'       => $recurring
+						'recurring'       => $recurring,
 					);
 				} else {
 					$this->remove($key);

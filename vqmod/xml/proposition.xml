@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+
+	<file name="system/library/cart.php">
+        <operation error="log">
+            <search position="replace"><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $srcimage = '')]]></search>
+            <add><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $srcimage = '', $proposition = "")]]></add>
+        </operation>
+        <operation error="log">
+            <search position="before"><![CDATA[$key = base64_encode(serialize($product));]]></search>
+            <add><![CDATA[
+                if($proposition) {
+                    $product['proposition'] = $proposition;
+                }
+            ]]></add>
+        </operation>
+        <operation error="log">
+            <search position="before"><![CDATA[$this->data[$key] = array(]]></search>
+            <add><![CDATA[
+                $is_proposition = false;
+                if(isset($product['proposition'])) {
+                    $query_proposition = $this->db->query("SELECT p.product_id AS main_product, pp.product_id, pp.price_included FROM proposition p LEFT JOIN proposition_product pp ON (pp.proposition_id = p.proposition_id AND pp.product_id = '" . $product_query->row['product_id'] . "') WHERE p.proposition_id = '" . (int) $product['proposition'] . "'");
+                    if($query_proposition->row['price_included']) {
+                        $is_proposition = true;
+                        $price = (double) $query_proposition->row['price_included'];
+                    }
+                }
+            ]]></add>
+        </operation>
+        <operation error="log">
+            <search position="after"><![CDATA['recurring'       => $recurring,]]></search>
+            <add><![CDATA[
+                'proposition'     => $is_proposition,
+            ]]></add>
+        </operation>
+	</file>
+
+</modification>

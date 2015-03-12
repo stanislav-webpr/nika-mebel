@@ -515,11 +515,11 @@ class ModelCatalogProduct extends Model {
         $result = array();
         $query_proposition = $this->db->query("SELECT * FROM " . DB_PREFIX . "proposition  WHERE product_id = " . (int) $product_id);
         foreach($query_proposition->rows as $key => $proposition) {
-            $result[$key] = array('name' => $proposition['name'], 'products' => array());
+            $result[$proposition['proposition_id']] = array('name' => $proposition['name'], 'products' => array());
             $query_products = $this->db->query("SELECT * FROM " . DB_PREFIX . "proposition_product WHERE proposition_id = " . (int) $proposition['proposition_id'] . " AND amount != 0 ORDER BY sort");
             foreach($query_products->rows as $product) {
                 $product_info = $this->getProduct($product['product_id']);
-                $result[$key]['products'][] = array(
+                $result[$proposition['proposition_id']]['products'][] = array(
                     'product_id' => $product['product_id'],
                     'image' => $product_info['image'],
                     'name' => $product_info['name'],
@@ -534,7 +534,7 @@ class ModelCatalogProduct extends Model {
         return $result;
     }
 
-    public function getAllPropositionProducts() {
+    public function getAPropositionProducts($product_id) {
         $result = array();
         $query = $this->db->query("SELECT pp.*, p.price FROM " . DB_PREFIX . "proposition_product pp LEFT JOIN " . DB_PREFIX . "product p ON (p.product_id = pp.product_id)");
         foreach($query->rows as $product) {

@@ -108,12 +108,6 @@ class ControllerCommonCart extends Controller {
 				$total = false;
 			}
 
-            $is_proposition = false;
-            $proposition_products = $this->model_catalog_product->getAllPropositionProducts();
-            if(isset($proposition_products[$product['product_id']])) {
-                $is_proposition = true;
-            }
-
 			$data['products'][] = array(
 				'key'       => $product['key'],
 				'thumb'     => $image,
@@ -125,7 +119,7 @@ class ControllerCommonCart extends Controller {
 				'price'     => $price,
 				'total'     => $total,
 				'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id']),
-                'is_proposition' => $is_proposition,
+                'is_proposition' => $product['proposition'],
 			);
 		}
 

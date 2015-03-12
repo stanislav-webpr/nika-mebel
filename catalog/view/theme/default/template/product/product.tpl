@@ -297,6 +297,7 @@
           </div>
         </div>
       </div>
+          <?php if($proposition_status) { ?>
           <div class="col-sm-12 proposition-slick">
               <?php foreach ($propositions as $proposition_id => $proposition) { ?>
               <div id="proposition_<?php echo $proposition_id; ?>" class="row">
@@ -402,6 +403,7 @@
                   </div>
                   <?php } ?>
               </div>
+          <?php } ?>
           <div class="col-sm-12">
               <ul class="nav nav-tabs">
                   <li class="active"><a href="#tab-all" data-toggle="tab"><?php echo $tab_all; ?></a></li>
@@ -1215,6 +1217,7 @@ $(document).ready(function() {
                     console.log(options);
                     products[index]['product_id'] = product_id;
                     products[index]['options'] = options;
+                    products[index]['proposition_id'] = proposition_id;
                 });
 
                 $.ajax({

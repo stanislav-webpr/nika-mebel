@@ -724,9 +724,9 @@ class ModelCatalogProduct extends Model {
 
             $query_products = $this->db->query("SELECT * FROM " . DB_PREFIX . "proposition_product WHERE proposition_id = '" . (int) $proposition['proposition_id'] . "' ORDER BY sort");
             foreach($query_products->rows as $key_product => $product) {
-                $query_product_info = $this->db->query("SELECT p.price, pd.name FROM " . DB_PREFIX . "product p LEFT JOIN product_description pd ON (pd.product_id = p.product_id) WHERE p.product_id = '" . (int) $product['product_id'] . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
-                $product_price = $query_product_info->row['price'];
-                $product_name = $query_product_info->row['name'];
+                $product_info = $this->getProduct($product['product_id']);
+                $product_price = $product_info['price'];
+                $product_name = $product_info['name'];
                 $result[$key]['products'][$key_product]['product_id'] = $product['product_id'];
                 $result[$key]['products'][$key_product]['name'] = $product_name;
                 $result[$key]['products'][$key_product]['price'] = $product_price;

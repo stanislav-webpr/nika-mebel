@@ -66,7 +66,9 @@ class ControllerCheckoutProposition extends Controller
                             }
                         }
 
-                        $this->cart->add($product['product_id'], 1, $option, $recurring_id);
+                        $proposition = $product['proposition_id'];
+
+                        $this->cart->add($product['product_id'], 1, $option, $recurring_id, "", $proposition);
 
                         $json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $product['product_id']), $product_info['name'], $this->url->link('checkout/cart'));
 

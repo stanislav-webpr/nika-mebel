@@ -40,9 +40,13 @@
                                                 <small><?php echo $text_recurring; ?> <?php echo $product['recurring']; ?></small>
                                             <?php } ?></td>
                                         <td class="text-right">x
-                                            <i class="fa fa-plus" id="plus" onclick="cart.quantity.plus('<?php echo $product['key']; ?>', $(this).parent().find('input').val());"></i>
-                                            <input type="text" size="3" value="<?php echo $product['quantity']; ?>" onchange="cart.quantity.update('<?php echo $product['key']; ?>', $(this).val())"/>
-                                            <i class="fa fa-minus" id="minus" onclick="cart.quantity.minus('<?php echo $product['key']; ?>', $(this).parent().find('input').val());"></i>
+                                            <?php if(!$product['is_proposition']) { ?>
+                                                <i class="fa fa-plus" id="plus" onclick="cart.quantity.plus('<?php echo $product['key']; ?>', $(this).parent().find('input').val());"></i>
+                                                <input type="text" size="3" value="<?php echo $product['quantity']; ?>" onchange="cart.quantity.update('<?php echo $product['key']; ?>', $(this).val())"/>
+                                                <i class="fa fa-minus" id="minus" onclick="cart.quantity.minus('<?php echo $product['key']; ?>', $(this).parent().find('input').val());"></i>
+                                            <?php } else { ?>
+                                                <?php echo $product['quantity']; ?>
+                                            <?php } ?>
                                         </td>
                                         <td class="text-right"><?php echo $product['total']; ?></td>
                                         <td class="text-center">

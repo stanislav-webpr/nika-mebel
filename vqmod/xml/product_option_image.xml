@@ -214,7 +214,10 @@
 				$('#button-cart').on('click', function() {
 			]]></search>
 			<add><![CDATA[
-				var mainImg = $('ul.thumbnails a.thumbnail:first').attr('data-image-path');
+				var mainImg = "";
+				if($('ul.thumbnails a.thumbnail:first').attr('data-image-path')) {
+				    mainImg = $('ul.thumbnails a.thumbnail:first').attr('data-image-path');
+				}
 				var data = $('#product input[type=\'text\'], #product input[type=\'hidden\'], #product input[type=\'radio\']:checked, #product input[type=\'checkbox\']:checked, #product select, #product textarea').serialize();
 			]]></add>
 		</operation>
@@ -235,7 +238,7 @@
 			]]></search>
 			<add><![CDATA[
 				$srcimage ="";
-				if (isset($this->request->post['image'])) {
+				if ($this->request->post['image']) {
 					$srcimage = $this->request->post['image'];
 				}else{
 					$srcimage = "";
@@ -262,11 +265,13 @@
 			]]></add>
 		</operation>
 		<operation error="log">
-			<search position="after"><![CDATA[
-				if ((int)$qty && ((int)$qty > 0)) {
+			<search position="before"><![CDATA[
+				$key = base64_encode(serialize($product));
 			]]></search>
 			<add><![CDATA[
-				$this->session->data[$key.'_opt_image'] = $srcimage;
+                if ($srcimage != "") {
+                    $product['image'] = $srcimage;
+                }
 			]]></add>
 		</operation>
 		<operation error="log">
@@ -274,8 +279,8 @@
 				$this->data[$key] = array(
 			]]></search>
 			<add><![CDATA[
-				if($this->session->data[$key.'_opt_image'] != "") {
-					$image = $this->session->data[$key.'_opt_image'];
+				if(isset($product['image'])) {
+					$image = $product['image'];
 				}
 				else {
 					$image = $product_query->row['image'];

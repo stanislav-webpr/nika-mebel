@@ -462,117 +462,120 @@ class ControllerProductProduct extends Controller {
 			}
 
             //proposition
-            $propositions = $this->model_catalog_product->getPropositions($this->request->get['product_id']);
-            $data['propositions'] = array();
-            foreach($propositions as $key => $proposition) {
-                $data['propositions'][$key] = array('name' => $proposition['name'], 'products' => array());
-                $data['propositions'][$key]['total_new'] = 0;
-                $data['propositions'][$key]['total_old'] = 0;
-                foreach($proposition['products'] as $product) {
-                    if($product['image']) {
-                        $image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
-                    }
-                    else {
-                        $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
-                    }
-
-                    if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
-                        $price = $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')));
-                        $price_included = $this->currency->format($this->tax->calculate($product['price_included'], $product['tax_class_id'], $this->config->get('config_tax')));
-
-                        $odds = $price - $price_included;
-                        $percent = round($odds * 100 / $price, 0);
-                    } else {
-                        $price = false;
-                        $price_included = false;
-                        $percent = false;
-                    }
-
-                    if ($this->config->get('config_review_status')) {
-                        $rating = (int)$product['rating'];
-                    } else {
-                        $rating = false;
-                    }
-
-                    $options = array();
-
-                    foreach ($this->model_catalog_product->getProductOptions($product['product_id']) as $option) {
-                        $product_option_value_data = array();
-
-                        foreach ($option['product_option_value'] as $option_value) {
-                            if (!$option_value['subtract'] || ($option_value['quantity'] > 0)) {
-                                if ((($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) && (float)$option_value['price']) {
-                                    $option_price = $this->currency->format($this->tax->calculate($option_value['price'], $product_info['tax_class_id'], $this->config->get('config_tax') ? 'P' : false));
-                                } else {
-                                    $option_price = false;
-                                }
-
-                                $product_option_value_data[] = array(
-                                    'product_option_value_id' => $option_value['product_option_value_id'],
-                                    'option_value_id'         => $option_value['option_value_id'],
-                                    'name'                    => $option_value['name'],
-                                    'image'                   => $this->model_tool_image->resize($option_value['image'], 50, 50),
-                                    'price'                   => $option_price,
-                                    'price_prefix'            => $option_value['price_prefix']
-                                );
-                            }
+            $data['proposition_status'] = false;
+            if($this->config->get('proposition_status') && $this->config->get('proposition_status') == 1) {
+                $data['proposition_status'] = true;
+                $propositions = $this->model_catalog_product->getPropositions($this->request->get['product_id']);
+                $data['propositions'] = array();
+                foreach ($propositions as $key => $proposition) {
+                    $data['propositions'][$key] = array('name' => $proposition['name'], 'products' => array());
+                    $data['propositions'][$key]['total_new'] = 0;
+                    $data['propositions'][$key]['total_old'] = 0;
+                    foreach ($proposition['products'] as $product) {
+                        if ($product['image']) {
+                            $image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+                        } else {
+                            $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
                         }
 
-                        $options[] = array(
-                            'product_option_id'    => $option['product_option_id'],
-                            'product_option_value' => $product_option_value_data,
-                            'option_id'            => $option['option_id'],
-                            'name'                 => $option['name'],
-                            'type'                 => $option['type'],
-                            'value'                => $option['value'],
-                            'required'             => $option['required']
+                        if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
+                            $price = $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')));
+                            $price_included = $this->currency->format($this->tax->calculate($product['price_included'], $product['tax_class_id'], $this->config->get('config_tax')));
+
+                            $odds = $price - $price_included;
+                            $percent = round($odds * 100 / $price, 0);
+                        } else {
+                            $price = false;
+                            $price_included = false;
+                            $percent = false;
+                        }
+
+                        if ($this->config->get('config_review_status')) {
+                            $rating = (int)$product['rating'];
+                        } else {
+                            $rating = false;
+                        }
+
+                        $options = array();
+
+                        foreach ($this->model_catalog_product->getProductOptions($product['product_id']) as $option) {
+                            $product_option_value_data = array();
+
+                            foreach ($option['product_option_value'] as $option_value) {
+                                if (!$option_value['subtract'] || ($option_value['quantity'] > 0)) {
+                                    if ((($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) && (float)$option_value['price']) {
+                                        $option_price = $this->currency->format($this->tax->calculate($option_value['price'], $product_info['tax_class_id'], $this->config->get('config_tax') ? 'P' : false));
+                                    } else {
+                                        $option_price = false;
+                                    }
+
+                                    $product_option_value_data[] = array(
+                                        'product_option_value_id' => $option_value['product_option_value_id'],
+                                        'option_value_id' => $option_value['option_value_id'],
+                                        'name' => $option_value['name'],
+                                        'image' => $this->model_tool_image->resize($option_value['image'], 50, 50),
+                                        'price' => $option_price,
+                                        'price_prefix' => $option_value['price_prefix']
+                                    );
+                                }
+                            }
+
+                            $options[] = array(
+                                'product_option_id' => $option['product_option_id'],
+                                'product_option_value' => $product_option_value_data,
+                                'option_id' => $option['option_id'],
+                                'name' => $option['name'],
+                                'type' => $option['type'],
+                                'value' => $option['value'],
+                                'required' => $option['required']
+                            );
+                        }
+
+                        $data['propositions'][$key]['products'][] = array(
+                            'product_id' => $product['product_id'],
+                            'thumb' => $image,
+                            'name' => $product['name'],
+                            'description' => utf8_substr(strip_tags(html_entity_decode($product['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '...',
+                            'price' => $price,
+                            'price_included' => $price_included,
+                            'rating' => $rating,
+                            'href' => $this->url->link('product/product', 'product_id=' . $product['product_id']),
+                            'percent' => "-" . $percent . "%",
+                            'options' => $options
                         );
+
+                        $data['propositions'][$key]['total_new'] += $price_included;
+                        $data['propositions'][$key]['total_old'] += $price;
                     }
 
-                    $data['propositions'][$key]['products'][] = array(
-                        'product_id' => $product['product_id'],
-                        'thumb' => $image,
-                        'name' => $product['name'],
-                        'description' => utf8_substr(strip_tags(html_entity_decode($product['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '...',
-                        'price' => $price,
-                        'price_included' => $price_included,
-                        'rating' => $rating,
-                        'href' => $this->url->link('product/product', 'product_id=' . $product['product_id']),
-                        'percent' => "-" . $percent . "%",
-                        'options' => $options
-                    );
+                    $product_price = (double)($data['special'] ? $data['special'] : $data['price']);
 
-                    $data['propositions'][$key]['total_new'] += $price_included;
-                    $data['propositions'][$key]['total_old'] += $price;
+                    $data['propositions'][$key]['total_new'] += $product_price;
+                    $data['propositions'][$key]['total_old'] += $product_price;
+
+                    $data['propositions'][$key]['odds'] = "-" . $this->currency->format($data['propositions'][$key]['total_old'] - $data['propositions'][$key]['total_new'], $product_info['tax_class_id'], $this->config->get('config_tax'));
+
+                    $data['propositions'][$key]['total_new'] = $this->currency->format($this->tax->calculate($data['propositions'][$key]['total_new'], $product_info['tax_class_id'], $this->config->get('config_tax')));
+                    $data['propositions'][$key]['total_old'] = $this->currency->format($this->tax->calculate($data['propositions'][$key]['total_old'], $product_info['tax_class_id'], $this->config->get('config_tax')));
                 }
 
-                $product_price = (double) ($data['special'] ? $data['special'] : $data['price']);
+                if ($product_info['image']) {
+                    $image = $this->model_tool_image->resize($product_info['image'], $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+                } else {
+                    $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+                }
 
-                $data['propositions'][$key]['total_new'] += $product_price;
-                $data['propositions'][$key]['total_old'] += $product_price;
-
-                $data['propositions'][$key]['odds'] = "-" . $this->currency->format($data['propositions'][$key]['total_old'] - $data['propositions'][$key]['total_new'], $product_info['tax_class_id'], $this->config->get('config_tax'));
-
-                $data['propositions'][$key]['total_new'] = $this->currency->format($this->tax->calculate($data['propositions'][$key]['total_new'], $product_info['tax_class_id'], $this->config->get('config_tax')));
-                $data['propositions'][$key]['total_old'] = $this->currency->format($this->tax->calculate($data['propositions'][$key]['total_old'], $product_info['tax_class_id'], $this->config->get('config_tax')));
+                $data['main_product'] = array(
+                    'product_id' => $this->request->get['product_id'],
+                    'thumb' => $image,
+                    'name' => $product_info['name'],
+                    'description' => utf8_substr(strip_tags(html_entity_decode($data['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '...',
+                    'price' => $data['price'],
+                    'special' => $data['special'],
+                    'tax' => $data['tax'],
+                    'rating' => $data['rating']
+                );
             }
-
-            if ($product_info['image']) {
-                $image = $this->model_tool_image->resize($product_info['image'], $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
-            } else {
-                $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
-            }
-
-            $data['main_product'] = array(
-                'product_id' => $this->request->get['product_id'],
-                'thumb' => $image,
-                'name' => $product_info['name'],
-                'description' => utf8_substr(strip_tags(html_entity_decode($data['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '...',
-                'price'       => $data['price'],
-                'special'     => $data['special'],
-                'tax'         => $data['tax'],
-                'rating'      => $data['rating']
-            );
             //***********
 
 			$data['text_payment_recurring'] = $this->language->get('text_payment_recurring');
