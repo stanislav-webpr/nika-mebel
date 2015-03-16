@@ -435,6 +435,42 @@ class ControllerProductProduct extends Controller {
 					$rating = false;
 				}
 
+
+                $options = array();
+
+                foreach ($this->model_catalog_product->getProductOptions($result['product_id']) as $option) {
+                    $product_option_value_data = array();
+
+                    foreach ($option['product_option_value'] as $option_value) {
+                        if (!$option_value['subtract'] || ($option_value['quantity'] > 0)) {
+                            if ((($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) && (float)$option_value['price']) {
+                                $price_option = $this->currency->format($this->tax->calculate($option_value['price'], $result['tax_class_id'], $this->config->get('config_tax') ? 'P' : false));
+                            } else {
+                                $price_option = false;
+                            }
+
+                            $product_option_value_data[] = array(
+                                'product_option_value_id' => $option_value['product_option_value_id'],
+                                'option_value_id'         => $option_value['option_value_id'],
+                                'name'                    => $option_value['name'],
+                                'image'                   => $this->model_tool_image->resize($option_value['image'], 50, 50),
+                                'price'                   => $price_option,
+                                'price_prefix'            => $option_value['price_prefix']
+                            );
+                        }
+                    }
+
+                    $options[] = array(
+                        'product_option_id'    => $option['product_option_id'],
+                        'product_option_value' => $product_option_value_data,
+                        'option_id'            => $option['option_id'],
+                        'name'                 => $option['name'],
+                        'type'                 => $option['type'],
+                        'value'                => $option['value'],
+                        'required'             => $option['required']
+                    );
+                }
+
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
@@ -444,7 +480,8 @@ class ControllerProductProduct extends Controller {
 					'special'     => $special,
 					'tax'         => $tax,
 					'rating'      => $rating,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
+					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id']),
+                    'options'     => $options,
 				);
 			}
 
@@ -577,6 +614,32 @@ class ControllerProductProduct extends Controller {
                 );
             }
             //***********
+
+            //complect
+            $data['complect'] = array();
+            $data['complects_status'] = false;
+            if($this->config->get('complects_status') && $this->config->get('complects_status') == 1) {
+                $data['complects_status'] = true;
+                $complect = $this->model_catalog_product->getComplect($this->request->get['product_id']);
+                foreach ($complect as $product) {
+                    if($product['image']) {
+                        $image = $this->model_tool_image->resize($product['image'],$this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+                    } else {
+                        $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+                    }
+
+                    $data['complect'][] = array(
+                        'product_id' => $product['product_id'],
+                        'name' => $product['name'],
+                        'thumb' => $image,
+                        'price' => $this->currency->format($product['price'], $product_info['tax_class_id'], $this->config->get('config_tax')),
+                        'length' => sprintf($this->language->get('text_complect_dimensions'), round($product['length'], 0)),
+                        'width' => sprintf($this->language->get('text_complect_dimensions'), round($product['width'], 0)),
+                        'height' => sprintf($this->language->get('text_complect_dimensions'), round($product['height'], 0)),
+                    );
+                }
+            }
+            //********
 
 			$data['text_payment_recurring'] = $this->language->get('text_payment_recurring');
 			$data['recurrings'] = $this->model_catalog_product->getProfiles($this->request->get['product_id']);

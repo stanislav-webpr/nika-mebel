@@ -237,11 +237,11 @@
 				$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);
 			]]></search>
 			<add><![CDATA[
-				$srcimage ="";
+				$optional_data = array();
 				if ($this->request->post['image']) {
-					$srcimage = $this->request->post['image'];
+					$optional_data['srcimage'] = $this->request->post['image'];
 				}else{
-					$srcimage = "";
+					$optional_data['srcimage'] = "";
 				}
 			]]></add>
 		</operation>
@@ -250,7 +250,7 @@
 				$this->cart->add($this->request->post['product_id'], $this->request->post['quantity'], $option, $recurring_id);
 			]]></search>
 			<add><![CDATA[
-				$this->cart->add($this->request->post['product_id'], $this->request->post['quantity'], $option, $recurring_id, $srcimage);
+				$this->cart->add($this->request->post['product_id'], $this->request->post['quantity'], $option, $recurring_id, $optional_data);
 			]]></add>
 		</operation>
 	</file>
@@ -261,7 +261,7 @@
 				($product_id, $qty = 1, $option = array(), $recurring_id = 0)
 			]]></search>
 			<add><![CDATA[
-				($product_id, $qty = 1, $option = array(), $recurring_id = 0, $srcimage = '')
+				($product_id, $qty = 1, $option = array(), $recurring_id = 0, $optional_data = array())
 			]]></add>
 		</operation>
 		<operation error="log">
@@ -269,13 +269,13 @@
 				$key = base64_encode(serialize($product));
 			]]></search>
 			<add><![CDATA[
-                if ($srcimage != "") {
-                    $product['image'] = $srcimage;
+                if (isset($optional_data['srcimage']) && $optional_data['srcimage'] != "") {
+                    $product['image'] = $optional_data['srcimage'];
                 }
 			]]></add>
 		</operation>
 		<operation error="log">
-			<search position="before"><![CDATA[
+			<search position="before" index="1"><![CDATA[
 				$this->data[$key] = array(
 			]]></search>
 			<add><![CDATA[
@@ -288,8 +288,8 @@
 			]]></add>
 		</operation>
 		<operation error="log">
-			<search position="repalce"><![CDATA[
-				'image'           => $product_query->row['image'],
+			<search position="repalce" index="1"><![CDATA[
+				'image' => $product_query->row['image'],
 			]]></search>
 			<add><![CDATA[
 				'image'           => $image,

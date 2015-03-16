@@ -827,8 +827,8 @@ h2 {
   font-weight: 400;
   text-transform: uppercase; }
 
-input[type=checkbox] {
-  display: none; }
+/*input[type=checkbox] {*/
+  /*display: none; }*/
 
 .checkbox label {
   position: relative;

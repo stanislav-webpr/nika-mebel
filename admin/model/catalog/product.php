@@ -737,4 +737,41 @@ class ModelCatalogProduct extends Model {
         }
         return $result;
     }
+
+    public function getComplect($product_id)
+    {
+        $result = array();
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "complect c LEFT JOIN " . DB_PREFIX . "complect_product cp ON (cp.complect_id = c.complect_id) WHERE c.product_id = " . (int)$product_id);
+        if ($query->num_rows) {
+            foreach ($query->rows as $product) {
+                $result[] = array(
+                    'name' => $product['name'],
+                    'price' => $product['price'],
+                    'image' => $product['image'],
+                    'length' => $product['length'],
+                    'width' => $product['width'],
+                    'height' => $product['height'],
+                    'sort' => $product['sort'],
+                );
+            }
+        }
+        return $result;
+    }
+
+    public function saveComplect($product_id, $data)
+    {
+        $query = $this->db->query("SELECT complect_id FROM " . DB_PREFIX . "complect WHERE product_id = " . (int)$product_id);
+        if ($query->num_rows > 0) {
+            $complect_id = $query->row['complect_id'];
+            $this->db->query("DELETE FROM " . DB_PREFIX . "complect WHERE product_id = " . (int)$product_id);
+            $this->db->query("DELETE FROM " . DB_PREFIX . "complect_product WHERE complect_id = " . (int)$complect_id);
+        }
+
+
+        $this->db->query("INSERT INTO " . DB_PREFIX . "complect SET product_id = " . (int)$product_id);
+        $complect_id = $this->db->getLastId();
+        foreach ($data as $product) {
+            $this->db->query("INSERT INTO " . DB_PREFIX . "complect_product SET complect_id = " . (int)$complect_id . ", `name` = '" . $this->db->escape($product['name']) . "', `price` = '" . (double)$product['price'] . "', `image` = '" . $this->db->escape($product['image']) . "', `length` = " . (double)$product['length'] . ", `width` = " . (double)$product['width'] . ", `height` = " . (double)$product['height'] . ", sort = " . (int)$product['sort']);
+        }
+    }
 }

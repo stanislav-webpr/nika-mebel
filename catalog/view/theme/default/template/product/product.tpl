@@ -399,10 +399,174 @@
                                   <button type="button" onclick="proposition.add('<?php echo $proposition_id; ?>');"><span class="hidden-xs hidden-sm hidden-md"><?php echo $button_cart; ?></span> <i class="fa fa-shopping-cart"></i></button>
                               </div>
                           </div>
+                          <div class="clearfix"></div>
                       </div>
                   </div>
                   <?php } ?>
               </div>
+          <?php } ?>
+          <?php if($complects_status) { ?>
+            <div class="row col-sm-12" id="complect">
+                <h2>Вы покупаете <span id="count">5</span> из 8 товаров комплекта</h2>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="select_all" onclick="complect.all();">Выбрать товары из этого комплекта
+                    </label>
+                    <span class="complect-discount">скидка 5%</span>
+                </div>
+                <div id="complect_products">
+                    <?php foreach ($complect as $product) { ?>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" id="product_<?php echo $product['product_id']; ?>">
+                            <div class="product-thumb transition">
+                                <img src="<?php echo $product['thumb']; ?>" alt="" class="img-responsive">
+                                <h4><?php echo $product['name']; ?></h4>
+
+                                <div class="col-sm-4">
+                                    <img src="image/catalog/width.png" alt="">
+
+                                    <div class="size-value"><?php echo $product['width']; ?></div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <img src="image/catalog/height.png" alt="">
+
+                                    <div class="size-value"><?php echo $product['height']; ?></div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <img src="image/catalog/deep.png" alt="">
+
+                                    <div class="size-value"><?php echo $product['length']; ?></div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="price col-sm-6 pull-left"><?php echo $product['price']; ?></div>
+                                    <div class="quantity col-sm-6 pull-right">
+                                        <i class="fa fa-plus" style="float: left; margin-top: 10px;" onclick="complect.quantity.plus('<?php echo $product['product_id']; ?>')"></i>
+                                        <div class="col-sm-8"><input type="text" class="form-control" id="quantity" value="1" /></div>
+                                        <i class="fa fa-minus" style="float: left; margin-top: 10px;" onclick="complect.quantity.minus('<?php echo $product['product_id']; ?>')"></i>
+                                    </div>
+                                </div>
+                                <div class="add-complect">
+                                    <label for="add_complect">Добавить в комплект</label>
+                                    <input type="checkbox" id="add_complect" onclick="complect.add('<?php echo $product['product_id']; ?>')">
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+              <script>
+                  $(function() {
+                      checkProducts();
+                      $('#cart_modal').on('hidden.bs.modal', function (e) {
+                          checkProducts();
+                      });
+                  });
+
+                  var complect = {
+                      add: function(id) {
+                          if(!$('#complect_products #product_' + id + ' #add_complect').prop("checked")) {
+                              $('#complect_products #product_' + id).removeClass('selected');
+                              var key = $('#complect_products #product_' + id + ' #quantity').attr('data-product-key');
+                              cart.remove(key);
+                              foooterBuy();
+                          } else {
+                              $('#complect_products #product_' + id).addClass('selected');
+
+                              updateCount();
+
+                              var quantity = $('#complect_products #product_' + id + ' #quantity').val();
+                              var product_id = <?php echo $product_id; ?>;
+                              var complect_product_id = id;
+                              $.ajax({
+                                  url: 'index.php?route=checkout/complect/add',
+                                  type: 'post',
+                                  data: {product_id: product_id, complect_product_id: complect_product_id, quantity: quantity},
+                                  dataType: 'json',
+                                  success: function(json) {
+                                      if (json['success']) {
+                                          $('#cart-total').html(json['total']);
+                                          $('#cart > #cart_modal').load('index.php?route=common/cart/info #cart > #cart_modal > *', function () {$('.footer-buy .total').text($('#cart_modal #total').text()); $('input[name=telephone]').mask("+380 (999) 999-99-99");});
+                                          checkProducts();
+                                          foooterBuy();
+                                      }
+                                  }
+                              });
+                          }
+                      },
+                      quantity: {
+                          plus: function(id) {
+                              var input_quantity = $('#complect_products #product_' + id + ' #quantity');
+                              var quantity = $(input_quantity).val();
+                              ++quantity;
+                              $(input_quantity).val(quantity);
+                              updateCount();
+
+                              if($(input_quantity).attr('data-product-key')) {
+                                  var key = $(input_quantity).attr('data-product-key');
+                                  cart.quantity.update(key, quantity);
+                                  checkProducts();
+                                  foooterBuy();
+                              }
+                          },
+                          minus: function(id) {
+                              var input_quantity = $('#complect_products #product_' + id + ' #quantity');
+                              var quantity = $(input_quantity).val();
+                              if(quantity == 1) {
+                                  $(input_quantity).val(quantity);
+                              }
+                              else {
+                                  --quantity;
+                                  $(input_quantity).val(quantity);
+                                  updateCount();
+                              }
+
+                              if($(input_quantity).attr('data-product-key')) {
+                                  if($(input_quantity).attr('data-product-key')) {
+                                      var key = $(input_quantity).attr('data-product-key');
+                                      cart.quantity.update(key, quantity);
+                                      checkProducts();
+                                      foooterBuy();
+                                  }
+                              }
+                          }
+                      },
+                      all: function() {
+                          var complect = $('#complect_products');
+                          $(complect).find('.product-thumb').each(function(index, element) {
+                              if(!$(element).find('#add_complect').prop('checked')) {
+                                  $(element).find('#add_complect').trigger('click');
+                              }
+                              if(!$('#complect #select_all').prop('checked')) {
+                                  $(element).find('#add_complect').trigger('click');
+                              }
+                          });
+                          updateCount();
+                          checkProducts();
+                          foooterBuy();
+                      }
+                  }
+
+                  function updateCount() {
+                      var count = $('#complect_products .product-thumb #add_complect:checked').length;
+                      $('#complect > h2 span#count').text(count);
+                  }
+
+                  function checkProducts() {
+                      $.ajax({
+                          url: 'index.php?route=checkout/complect/get_added_products',
+                          dataType: 'json',
+                          success: function(json) {
+                              for(var key in json) {
+                                  $('#complect_products #product_' + json[key].product_id + ' #quantity').val(json[key].quantity);
+                                  $('#complect_products #product_' + json[key].product_id + ' #quantity').attr('data-product-key', json[key].key);
+                                  $('#complect_products #product_' + json[key].product_id + ' #add_complect').attr('checked', 'true');
+                                  $('#complect_products #product_' + json[key].product_id).addClass('selected');
+                              }
+                          }
+                      });
+                  }
+
+              </script>
           <?php } ?>
           <div class="col-sm-12">
               <ul class="nav nav-tabs">
@@ -545,6 +709,52 @@
               <button type="button" data-toggle="tooltip" title="<?php echo $button_wishlist; ?>" onclick="wishlist.add('<?php echo $product['product_id']; ?>');"><i class="fa fa-heart"></i></button>
               <button type="button" data-toggle="tooltip" title="<?php echo $button_compare; ?>" onclick="compare.add('<?php echo $product['product_id']; ?>');"><i class="fa fa-exchange"></i></button>
             </div>
+              <div class="dropdown-caption">
+                  <?php if ($product['options']) { ?>
+                      <div class="options clearfix">
+                          <div class="option-select col-sm-6 pull-right">
+                              <div class="name-select">Размеры</div>
+                              <?php foreach ($product['options'] as $option) { ?>
+                                  <?php if ($option['type'] == 'select') { ?>
+                                      <div class="col-sm-4">
+                                          <div class="name"><?php echo $option['name']; ?></div>
+                                          <?php foreach ($option['product_option_value'] as $option_value) { ?>
+                                              <img src="<?php echo $option_value['image']; ?>" alt="<?php echo $option_value['name'] . ($option_value['price'] ? ' ' . $option_value['price_prefix'] . $option_value['price'] : ''); ?>" class="pull-left"/>
+                                              <div class="value"><?php echo $option_value['name']; ?>
+
+                                                  <?php if ($option_value['price']) { ?>
+                                                      <span>(<?php echo $option_value['price_prefix']; ?><?php echo $option_value['price']; ?>)</span>
+                                                  <?php } ?>
+                                              </div>
+                                          <?php } ?>
+                                      </div>
+                                  <?php } ?>
+                              <?php } ?>
+                          </div>
+
+                          <?php foreach ($product['options'] as $option) { ?>
+
+                              <?php if ($option['type'] == 'image') { ?>
+                                  <div class="option-image col-sm-6">
+                                      <div class="name"><?php echo $option['name']; ?></div>
+                                      <div class="wrapper-value clearfix">
+                                          <?php foreach ($option['product_option_value'] as $option_value) { ?>
+
+                                              <div class="value clearfix">
+                                                  <img src="<?php echo $option_value['image']; ?>" alt="<?php echo $option_value['name'] . ($option_value['price'] ? ' ' . $option_value['price_prefix'] . $option_value['price'] : ''); ?>"/>
+                                              </div>
+                                          <?php } ?>
+                                      </div>
+                                  </div>
+                              <?php } ?>
+                          <?php } ?>
+                      </div>
+                  <?php } ?>
+
+                  <button type="button" data-toggle="tooltip" title="<?php echo $button_wishlist; ?>" onclick="wishlist.add('<?php echo $product['product_id']; ?>');" class="button-wishlist"><i></i><span>В список желаний</span></button>
+                  <button type="button" data-toggle="tooltip" title="<?php echo $button_compare; ?>" onclick="compare.add('<?php echo $product['product_id']; ?>');" class="button-compare"><i></i><span>Сравнить</span></button>
+
+              </div> <!-- end dropdown-caption-->
           </div>
         </div>
         <?php if (($column_left && $column_right) && ($i % 2 == 0)) { ?>
@@ -772,23 +982,29 @@ $(document).ready(function() {
     <script>
         $(function() {
             $(window).scroll(function() {
-                var total = $('#cart_modal #total');
-//                total.text("");
-//                $('.footer-buy').addClass('hidden');
-                if($(total).text() !== "") {
-                    $('.footer-buy .total').text(total.text());
-                    scroll_t = $(this).scrollTop();
-                    if (scroll_t > 100) {
-                        $('.footer-buy').removeClass('hidden');
-                    } else {
-                        $('.footer-buy').addClass('hidden');
-                    }
-                }
-                else {
-                    $('.footer-buy').addClass('hidden');
-                }
+                foooterBuy();
+            });
+
+            $('#cart_modal').on('hidden.bs.modal', function (e) {
+                foooterBuy();
             });
         });
+
+        function foooterBuy() {
+            var total = $('#cart_modal #total');
+            if($(total).text() !== "") {
+                $('.footer-buy .total').text(total.text());
+                scroll_t = $(this).scrollTop();
+                if (scroll_t > 100) {
+                    $('.footer-buy').removeClass('hidden');
+                } else {
+                    $('.footer-buy').addClass('hidden');
+                }
+            }
+            else {
+                $('.footer-buy').addClass('hidden');
+            }
+        }
     </script>
 
     <script>

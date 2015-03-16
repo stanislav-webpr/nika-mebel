@@ -1,0 +1,4 @@
+#complect_products div.selected .product-thumb {
+    background-color: #fcf8e3 !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}

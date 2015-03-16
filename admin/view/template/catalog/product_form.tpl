@@ -990,71 +990,64 @@
                       </div>
                   </div>
               <?php } ?>
-              <?php if (isset($product_id) /*&& $complects_status*/) { ?>
+              <?php if (isset($product_id) && $complects_status) { ?>
                   <div class="tab-pane" id="tab-complects">
                       <div class="clearfix">
                           <blockquote>
-                              <p><?php echo $text_complects_warning; ?></p>
+                              <p><?php echo $text_complect_warning; ?></p>
                           </blockquote>
                       </div>
                       <hr/>
                       <div class="table-responsive">
-<!--                          --><?php //$complect_row = 0; ?>
-<!--                          --><?php //foreach ($complects as $product) { ?>
-                              <table class="table table-bordered table-hover" id="proposition_<?php echo $proposition_row; ?>">
-                                  <caption>
-                                      <div class="pull-right">
-                                          <button class="btn btn-info proposition-save" onclick="proposition.save();" type="button" title="" data-toggle="tooltip" data-original-title="<?php echo $button_save; ?>"><i class="fa fa-save"></i></button>
-                                      </div>
-                                  </caption>
-                                  <thead>
+                          <table class="table table-bordered table-hover" id="complect">
+                              <caption>
+                                  <div class="pull-right">
+                                      <button class="btn btn-info proposition-save" onclick="complect.save();" type="button" title="" data-toggle="tooltip" data-original-title="<?php echo $button_save; ?>"><i class="fa fa-save"></i></button>
+                                  </div>
+                              </caption>
+                              <thead>
+                              <tr>
+                                  <td class="text-left"><?php echo $entry_complect_product_name; ?></td>
+                                  <td class="text-left"><?php echo $entry_complect_product_image; ?></td>
+                                  <td class="text-left"><?php echo $entry_complect_product_price; ?></td>
+                                  <td class="text-left"><?php echo $entry_complect_product_length; ?>, <?php echo $entry_complect_product_width; ?>, <?php echo $entry_complect_product_height; ?></td>
+                                  <td class="text-left"><?php echo $entry_complect_product_sort; ?></td>
+                                  <td></td>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <?php $complect_product_row = 0; ?>
+                              <?php foreach ($complect as $product) { ?>
+                                  <tr id="product" data-product-row="<?php echo $complect_product_row; ?>">
+                                      <td class="text-left" id="name"><input class="form-control" type="text" value="<?php echo $product['name']; ?>"/></td>
+                                      <td class="text-left" id="image">
+                                          <a href="" id="complect-product-thumb-image-<?php echo $complect_product_row; ?>" data-toggle="image" class="img-thumbnail">
+                                              <img src="<?php echo $product['thumb']; ?>" alt="" title="" data-placeholder="<?php echo $placeholder; ?>" />
+                                          </a>
+                                          <input type="hidden" value="<?php echo $product['image']; ?>" id="complect-product-input-image-<?php echo $complect_product_row; ?>" />
+                                      </td>
+                                      <td class="text-left" id="price"><input class="form-control" type="text" value="<?php echo $product['price']; ?>"/></td>
+                                      <td class="text-left" id="dimensions"><input class="form-control" id="length" type="text" value="<?php echo $product['length']; ?>" placeholder="<?php echo $entry_complect_product_length; ?>"/>
+                                          <input class="form-control" id="width" type="text" value="<?php echo $product['width']; ?>" placeholder="<?php echo $entry_complect_product_width; ?>"/>
+                                          <input class="form-control" id="height" type="text" value="<?php echo $product['height']; ?>" placeholder="<?php echo $entry_complect_product_height; ?>"/></td>
+                                      <td class="text-left" id="sort"><input class="form-control" type="text" value="<?php echo $product['sort']; ?>" /></td>
+                                      <td class="text-left">
+                                          <button type="button" onclick="complect.product.remove('<?php echo $complect_product_row; ?>');" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i>
+                                          </button>
+                                      </td>
+                                  </tr>
+                                  <?php ++$complect_product_row; ?>
+                              <?php } ?>
+                              </tbody>
+                              <tfoot>
                                   <tr>
-                                      <td class="text-left"><?php echo $text_complect_product_name; ?></td>
-                                      <td class="text-left"><?php echo $text_complect_product_image; ?></td>
-                                      <td class="text-left"><?php echo $text_complect_price_included; ?></td>
-                                      <td class="text-left"><?php echo $text_complect_amount; ?></td>
-                                      <td class="text-left"><?php echo $text_complect_sort; ?></td>
-                                      <td></td>
+                                      <td class="text-left" colspan="6">
+                                          <button type="button" onclick="complect.product.add();" data-toggle="tooltip" title="<?php echo $button_complect_add; ?>" class="btn btn-primary pull-right"><i class="fa fa-plus-circle"></i></button>
+                                      </td>
                                   </tr>
-                                  </thead>
-                                  <tbody>
-                                  <tr class="info">
-                                      <td class="text-left"><?php echo isset($product_description[$language_id]) ? $product_description[$language_id]['name'] : ''; ?></td>
-                                      <td class="text-left"><?php echo $price; ?></td>
-                                      <td class="text-left"><?php echo $price; ?></td>
-                                      <td class="text-left"></td>
-                                      <td class="text-left"></td>
-                                      <td class="text-left"></td>
-                                  </tr>
-                                  <?php foreach ($proposition['products'] as $product) { ?>
-                                      <tr id="product_<?php echo $product_row; ?>" data-product-id="<?php echo $product['product_id']; ?>">
-                                          <td class="text-left" id="name"><?php echo $product['name']; ?></td>
-                                          <td class="text-left" id="price"><?php echo $product['price']; ?></td>
-                                          <td class="text-left" id="price_included"><input class="price_included form-control" type="text" value="<?php echo $product['price_included']; ?>"/></td>
-                                          <td class="text-left" id="amount"><input class="form-control" type="text" value="<?php echo $product['amount']; ?>"/></td>
-                                          <td class="text-left" id="sort"><input class="form-control" type="text" value="<?php echo $product['sort']; ?>"/></td>
-                                          <td class="text-left">
-                                              <button type="button" onclick="proposition.product.remove('<?php echo $proposition_row; ?>', '<?php echo $product_row; ?>');" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i>
-                                              </button>
-                                          </td>
-                                      </tr>
-                                      <?php ++$product_row; ?>
-                                  <?php } ?>
-                                  <tr>
-                                      <td colspan="3"><input id="proposition_product_add_<?php echo $proposition_row; ?>" data-proposition-row="<?php echo $proposition_row; ?>" data-product-row="<?php echo $product_row; ?>" class="form-control" type="text" placeholder="<?php echo $entry_proposition_product; ?>"/></td>
-                                      <td colspan="3"></td>
-                                  </tr>
-                                  <tr>
-                                      <td class="text-left"><?php echo $text_proposition_sum; ?></td>
-                                      <td class="text-left" id="price_total"></td>
-                                      <td class="text-left" id="price_included_total"></td>
-                                      <td colspan="3"></td>
-                                  </tr>
-                                  </tbody>
-                              </table>
-                              <div class="clearfix"></div>
-<!--                              --><?php //++$proposition_row; ?>
-<!--                          --><?php //} ?>
+                              </tfoot>
+                          </table>
+                          <div class="clearfix"></div>
                       </div>
                   </div>
               <?php } ?>
@@ -1615,8 +1608,6 @@ $('#option a:first').tab('show');
                     result[proposition_id]['name'] = proposition_name;
                     result[proposition_id]['products'] = {};
 
-                    console.log(result[proposition_id]);
-
                     $(this).find('tbody tr[data-product-id]').each(function (index, element) {
                         var product_id = $(element).attr('data-product-id');
                         var price_included = $(element).find('td#price_included input').val();
@@ -1730,6 +1721,77 @@ $('#option a:first').tab('show');
             $('input.price_included').on('change', generateTotal);
         });
 
+    </script>
+<?php } ?>
+
+<?php if (isset($product_id) && $complects_status) { ?>
+    <script>
+        var complect_product_row = <?php echo $complect_product_row; ?>;
+
+        var complect = {
+            save: function() {
+                var products = {};
+                $('#tab-complects #complect tbody tr').each(function (index, element) {
+                    var name = $(element).find('td#name input').val();
+                    var image = $(element).find('td#image input').val();
+                    var price = $(element).find('td#price input').val();
+                    var length = $(element).find('td#dimensions #length').val();
+                    var width = $(element).find('td#dimensions #width').val();
+                    var height = $(element).find('td#dimensions #height').val();
+                    var sort = $(element).find('td#sort input').val();
+
+                    products[index] = {
+                        name: name,
+                        image: image,
+                        price: price,
+                        length: length,
+                        width: width,
+                        height: height,
+                        sort: sort
+                    };
+                });
+
+                $.ajax({
+                    url: 'index.php?route=catalog/product/save_complect&token=<?php echo $token; ?>&product_id=' + <?php echo $product_id; ?>,
+                    type: 'POST',
+                    data: products,
+                    dataType: 'json',
+                    success: function (json) {
+                        $('#content .page-header .container-fluid .alert').remove();
+                        if(json.status) {
+                            $('#content .page-header .container-fluid').append('<div class="alert alert-success"><i class="fa fa-check-circle"></i>' + json.message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                        }
+                        else {
+                            $('#content .page-header .container-fluid').append('<div class="alert alert-danger"><i class="fa fa-check-circle"></i>' + json.message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                        }
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                    }
+                });
+
+            },
+            product: {
+                add: function () {
+                    var html = '<tr id="product" data-product-row="' + complect_product_row + '">' +
+                        '<td class="text-left" id="name"><input class="form-control" type="text" value=""/></td>' +
+                        '<td class="text-left" id="image"><a href="" id="complect-product-thumb-image-' + complect_product_row + '" data-toggle="image" class="img-thumbnail"><img src="<?php echo $placeholder; ?>" alt="" title="" data-placeholder="<?php echo $placeholder; ?>" /></a><input type="hidden" value="" id="complect-product-input-image-' + complect_product_row + '" /></td>' +
+                        '<td class="text-left" id="price"><input class="form-control" type="text" value=""/></td>' +
+                        '<td class="text-left" id="dimensions"><input class="form-control" id="length" type="text" value="" placeholder="<?php echo $entry_complect_product_length; ?>"/>' +
+                        '<input class="form-control" id="width" type="text" value="" placeholder="<?php echo $entry_complect_product_width; ?>"/>' +
+                        '<input class="form-control" id="height" type="text" value="" placeholder="<?php echo $entry_complect_product_height; ?>"/></td>' +
+                        '<td class="text-left" id="sort"><input class="form-control" type="text" value="" /></td>' +
+                        '<td class="text-left">' +
+                        '<button type="button" onclick="complect.product.remove(\'' + complect_product_row + '\');" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i>' +
+                        '</button>' +
+                        '</td>' +
+                        '</tr>';
+                    $('#tab-complects #complect tbody').append(html);
+                    ++complect_product_row;
+                },
+                remove: function (id) {
+                    $('#tab-complects #complect tbody #product[data-product-row=' + id + ']').remove();
+                }
+            }
+        };
     </script>
 <?php } ?>
 

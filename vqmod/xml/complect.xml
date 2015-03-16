@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+
+	<file name="system/library/cart.php">
+        <operation error="log">
+            <search position="before"><![CDATA[$key = base64_encode(serialize($product));]]></search>
+            <add><![CDATA[
+                if(isset($optional_data['complect_product_id'])) {
+                    $product['complect_product_id'] = $optional_data['complect_product_id'];
+                }
+            ]]></add>
+        </operation>
+        <operation error="log">
+            <search position="before"><![CDATA[$product_id = $product['product_id'];]]></search>
+            <add><![CDATA[
+                if (!isset($product['complect_product_id'])) {
+            ]]></add>
+        </operation>
+        <operation error="log">
+            <search position="before" offset="3"><![CDATA[return $this->data;]]></search>
+            <add><![CDATA[
+                }
+                else {
+                    $product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "complect_product WHERE product_id = " . (int) $product['complect_product_id']);
+
+                    if ($product_query->num_rows) {
+                        $price = $product_query->row['price'];
+                        $this->data[$key] = array(
+                            'key' => $key,
+                            'product_id' => $product_query->row['product_id'],
+                            'name' => $product_query->row['name'],
+                            'model' => '',
+                            'shipping' => 1,
+                            'image' => $product_query->row['image'],
+                            'option' => array(),
+                            'download' => array(),
+                            'quantity' => $quantity,
+                            'minimum' => 1,
+                            'subtract' => '',
+                            'stock' => true,
+                            'price' => $price,
+                            'total' => $price * $quantity,
+                            'reward' => 0,
+                            'points' => 0,
+                            'tax_class_id' => 0,
+                            'weight' => 0,
+                            'weight_class_id' => 0,
+                            'length' => 0,
+                            'width' => 0,
+                            'height' => 0,
+                            'length_class_id' => 0,
+                            'recurring' => false,
+                            'proposition' => false,
+                            'complect_product_id' => $product_query->row['product_id'],
+                        );
+                    } else {
+                        $this->remove($key);
+                    }
+                }
+            ]]></add>
+        </operation>
+	</file>
+
+</modification>

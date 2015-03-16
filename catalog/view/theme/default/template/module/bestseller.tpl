@@ -33,9 +33,51 @@
                             <?php } ?>
                             <button type="button" onclick="cart.add('<?php echo $product['product_id']; ?>');" class="button-buy"> <span class="hidden-xs"><?php echo $button_cart; ?></span><i class="shopping-cart"></i></button>
 
-                            <button type="button" data-toggle="tooltip" title="<?php echo $button_wishlist; ?>" onclick="wishlist.add('<?php echo $product['product_id']; ?>');" class="button-wishlist"><i></i><span>В список желаний</span></button>
-                            <button type="button" data-toggle="tooltip" title="<?php echo $button_compare; ?>" onclick="compare.add('<?php echo $product['product_id']; ?>');" class="button-compare"><i></i><span>Сравнить</span></button>
+                            <div class="dropdown-caption">
+                                <?php if ($product['options']) { ?>
+                                    <div class="options clearfix">
+                                        <div class="option-select col-sm-6 pull-right">
+                                            <div class="name-select">Размеры</div>
+                                            <?php foreach ($product['options'] as $option) { ?>
+                                                <?php if ($option['type'] == 'select') { ?>
+                                                    <div class="col-sm-4">
+                                                        <div class="name"><?php echo $option['name']; ?></div>
+                                                        <?php foreach ($option['product_option_value'] as $option_value) { ?>
+                                                            <img src="<?php echo $option_value['image']; ?>" alt="<?php echo $option_value['name'] . ($option_value['price'] ? ' ' . $option_value['price_prefix'] . $option_value['price'] : ''); ?>" class="pull-left"/>
+                                                            <div class="value"><?php echo $option_value['name']; ?>
 
+                                                                <?php if ($option_value['price']) { ?>
+                                                                    <span>(<?php echo $option_value['price_prefix']; ?><?php echo $option_value['price']; ?>)</span>
+                                                                <?php } ?>
+                                                            </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                <?php } ?>
+                                            <?php } ?>
+                                        </div>
+
+                                        <?php foreach ($product['options'] as $option) { ?>
+
+                                            <?php if ($option['type'] == 'image') { ?>
+                                                <div class="option-image col-sm-6">
+                                                    <div class="name"><?php echo $option['name']; ?></div>
+                                                    <div class="wrapper-value clearfix">
+                                                        <?php foreach ($option['product_option_value'] as $option_value) { ?>
+
+                                                            <div class="value clearfix">
+                                                                <img src="<?php echo $option_value['image']; ?>" alt="<?php echo $option_value['name'] . ($option_value['price'] ? ' ' . $option_value['price_prefix'] . $option_value['price'] : ''); ?>"/>
+                                                            </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    </div>
+                                <?php } ?>
+
+                                <button type="button" data-toggle="tooltip" title="<?php echo $button_wishlist; ?>" onclick="wishlist.add('<?php echo $product['product_id']; ?>');" class="button-wishlist"><i></i><span>В список желаний</span></button>
+                                <button type="button" data-toggle="tooltip" title="<?php echo $button_compare; ?>" onclick="compare.add('<?php echo $product['product_id']; ?>');" class="button-compare"><i></i><span>Сравнить</span></button>
+                            </div> <!-- end dropdown-caption-->
                         </div>
                         </div>
                     </div>

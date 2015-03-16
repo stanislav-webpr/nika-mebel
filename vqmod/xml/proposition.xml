@@ -3,19 +3,19 @@
 
 	<file name="system/library/cart.php">
         <operation error="log">
-            <search position="replace"><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $srcimage = '')]]></search>
-            <add><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $srcimage = '', $proposition = "")]]></add>
+            <search position="replace"><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $optional_data = array())]]></search>
+            <add><![CDATA[($product_id, $qty = 1, $option = array(), $recurring_id = 0, $optional_data = array())]]></add>
         </operation>
         <operation error="log">
             <search position="before"><![CDATA[$key = base64_encode(serialize($product));]]></search>
             <add><![CDATA[
-                if($proposition) {
-                    $product['proposition'] = $proposition;
+                if(isset($optional_data['proposition'])) {
+                    $product['proposition'] = $optional_data['proposition'];
                 }
             ]]></add>
         </operation>
         <operation error="log">
-            <search position="before"><![CDATA[$this->data[$key] = array(]]></search>
+            <search position="before" index="1"><![CDATA[$this->data[$key] = array(]]></search>
             <add><![CDATA[
                 $is_proposition = false;
                 if(isset($product['proposition'])) {
@@ -28,9 +28,9 @@
             ]]></add>
         </operation>
         <operation error="log">
-            <search position="after"><![CDATA['recurring'       => $recurring,]]></search>
+            <search position="after" index="1"><![CDATA['recurring' => $recurring,]]></search>
             <add><![CDATA[
-                'proposition'     => $is_proposition,
+                'proposition' => $is_proposition,
             ]]></add>
         </operation>
 	</file>

@@ -653,7 +653,7 @@ class ControllerCatalogProduct extends Controller {
         //************
 
         //complects
-        if(isset($this->request->get['product_id']) /*&& ($this->config->get('complects_status') && $this->config->get('complects_status') == 1)*/) {
+        if(isset($this->request->get['product_id']) && ($this->config->get('complects_status') && $this->config->get('complects_status') == 1)) {
             $data['entry_complect_product_name'] = $this->language->get('entry_complect_product_name');
             $data['entry_complect_product_image'] = $this->language->get('entry_complect_product_image');
             $data['entry_complect_product_length'] = $this->language->get('entry_complect_product_length');
@@ -664,9 +664,9 @@ class ControllerCatalogProduct extends Controller {
 
             $data['button_complect_add'] = $this->language->get('button_complect_add');
 
-            $data['text_complects_warning'] = $this->language->get('text_complects_warning');
-            $data['text_complects_save_success'] = $this->language->get('text_complects_save_success');
-            $data['text_complects_save_error'] = $this->language->get('text_complects_save_error');
+            $data['text_complect_warning'] = $this->language->get('text_complect_warning');
+            $data['text_complect_save_success'] = $this->language->get('text_complect_warning');
+            $data['text_complect_save_error'] = $this->language->get('text_complect_warning');
 
             $data['tab_complects'] = $this->language->get('tab_complects');
         }
@@ -771,15 +771,6 @@ class ControllerCatalogProduct extends Controller {
         }
         //***********
 
-        //complects
-        $data['complects_status'] = false;
-        if(isset($this->request->get['product_id']) && ($this->config->get('complects_status') && $this->config->get('complects_status') == 1)) {
-            $data['product_id'] = $this->request->get['product_id'];
-            $data['complect'] = $this->model_catalog_product->getComplect($this->request->get['product_id']);
-            $data['complects_status'] = true;
-        }
-        //***********
-
 		$data['cancel'] = $this->url->link('catalog/product', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
 		if (isset($this->request->get['product_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
@@ -809,6 +800,39 @@ class ControllerCatalogProduct extends Controller {
 		}
 
 		$this->load->model('tool/image');
+
+
+        //complects
+        $data['complects_status'] = false;
+        if(isset($this->request->get['product_id']) && ($this->config->get('complects_status') && $this->config->get('complects_status') == 1)) {
+            $data['product_id'] = $this->request->get['product_id'];
+            $complect = $this->model_catalog_product->getComplect($this->request->get['product_id']);
+            $data['complect'] = array();
+            foreach($complect as $product) {
+                if($product['image']) {
+                    $thumb = $this->model_tool_image->resize($product['image'], 100, 100);
+                    $image = $product['image'];
+                }
+                else {
+                    $thumb = "no_image.png";
+                    $image = "";
+                }
+
+                $data['complect'][] = array(
+                    'name' => $product['name'],
+                    'image' => $image,
+                    'thumb' => $thumb,
+                    'price' => $product['price'],
+                    'length' => $product['length'],
+                    'width' => $product['width'],
+                    'height' => $product['height'],
+                    'sort' => $product['sort'],
+                );
+            }
+
+            $data['complects_status'] = true;
+        }
+        //***********
 
 		if (isset($this->request->post['image']) && is_file(DIR_IMAGE . $this->request->post['image'])) {
 			$data['thumb'] = $this->model_tool_image->resize($this->request->post['image'], 100, 100);
@@ -1513,6 +1537,18 @@ class ControllerCatalogProduct extends Controller {
         }
         else {
             echo json_encode(array('status'=> false, 'message' => $this->language->get('text_proposition_save_error')));
+        }
+    }
+
+    public function save_complect() {
+        $this->load->language('catalog/product');
+        if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+            $this->load->model('catalog/product');
+            $this->model_catalog_product->saveComplect($this->request->get['product_id'], $this->request->post);
+            echo json_encode(array('status'=> true, 'message' => $this->language->get('text_complect_save_success')));
+        }
+        else {
+            echo json_encode(array('status'=> false, 'message' => $this->language->get('text_complect_save_error')));
         }
     }
 }

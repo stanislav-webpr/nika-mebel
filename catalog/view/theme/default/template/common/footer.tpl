@@ -42,8 +42,6 @@
             <a href="<?php echo $facebook; ?>" class="fb-footer"><span></span></a>
             <a href="<?php echo $google_plus; ?>" class="gp-footer"><span></span></a>
             <a href="<?php echo $vk; ?>" class="vk-footer"><span></span></a>
-
-
         </p>
         </div>
     </div>

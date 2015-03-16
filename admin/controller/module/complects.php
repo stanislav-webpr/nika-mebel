@@ -1,16 +1,16 @@
 <?php
-class ControllerModuleProposition extends Controller {
+class ControllerModuleComplects extends Controller {
     private $error = array();
 
     public function index() {
-        $this->load->language('module/proposition');
+        $this->load->language('module/complects');
 
         $this->document->setTitle($this->language->get('heading_title'));
 
         $this->load->model('setting/setting');
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && ($this->validate())) {
-            $this->model_setting_setting->editSetting('proposition', $this->request->post);
+            $this->model_setting_setting->editSetting('complects', $this->request->post);
 
             $this->session->data['success'] = $this->language->get('text_success');
 
@@ -50,29 +50,29 @@ class ControllerModuleProposition extends Controller {
 
         $data['breadcrumbs'][] = array(
             'text'      => $this->language->get('heading_title'),
-            'href'      => $this->url->link('module/proposition', 'token=' . $this->session->data['token'], 'SSL'),
+            'href'      => $this->url->link('module/complects', 'token=' . $this->session->data['token'], 'SSL'),
             'separator' => ' :: '
         );
 
-        $data['action'] = $this->url->link('module/proposition', 'token=' . $this->session->data['token'], 'SSL');
+        $data['action'] = $this->url->link('module/complects', 'token=' . $this->session->data['token'], 'SSL');
 
         $data['cancel'] = $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');
 
-        if (isset($this->request->post['proposition_status'])) {
-            $data['proposition_status'] = $this->request->post['proposition_status'];
+        if (isset($this->request->post['complects_status'])) {
+            $data['complects_status'] = $this->request->post['complects_status'];
         } else {
-            $data['proposition_status'] = $this->config->get('proposition_status');
+            $data['complects_status'] = $this->config->get('complects_status');
         }
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
         $data['footer'] = $this->load->controller('common/footer');
 
-        $this->response->setOutput($this->load->view('module/proposition.tpl', $data));
+        $this->response->setOutput($this->load->view('module/complects.tpl', $data));
     }
 
     private function validate() {
-        if (!$this->user->hasPermission('modify', 'module/proposition')) {
+        if (!$this->user->hasPermission('modify', 'module/complects')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
@@ -84,13 +84,13 @@ class ControllerModuleProposition extends Controller {
     }
 
     public function install() {
-        $this->load->model('module/proposition');
-        $this->model_module_proposition->install();
+        $this->load->model('module/complects');
+        $this->model_module_complects->install();
     }
 
     public function uninstall() {
-        $this->load->model('module/proposition');
-        $this->model_module_proposition->uninstall();
+        $this->load->model('module/complects');
+        $this->model_module_complects->uninstall();
     }
 }
 ?>

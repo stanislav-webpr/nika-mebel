@@ -258,6 +258,8 @@ class ControllerProductCategory extends Controller {
                     );
                 }
 
+                $categories_id = explode(",", $result['category_list']);
+
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
